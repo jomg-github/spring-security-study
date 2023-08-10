@@ -1,0 +1,6 @@
+#spring:
+#  security:
+#    user:
+#      name: admin
+#      password: qawsedrf1!
+#      roles: ADMIN
