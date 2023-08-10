@@ -7,10 +7,13 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(of = {"id", "username", "password", "role"})
 public class Account {
     @Id @GeneratedValue
     private Long id;
@@ -28,7 +31,7 @@ public class Account {
         this.role = role;
     }
 
-    public void encodePassword() {
-        password = "{noop}" + password;
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        password = passwordEncoder.encode(password);
     }
 }
