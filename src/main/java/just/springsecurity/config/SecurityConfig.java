@@ -10,7 +10,10 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -24,20 +27,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
-        return roleHierarchy;
-    }
-
-    @Bean
-    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
-        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-        handler.setRoleHierarchy(roleHierarchy);
-        return handler;
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
@@ -66,12 +55,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService() {
-//        return new InMemoryUserDetailsManager(
-//                User.withUsername("jomg").password("{noop}123").roles("USER").build(),
-//                User.withUsername("admin").password("{noop}123").roles("ADMIN").build()
-//        );
-//    }
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+        return roleHierarchy;
+    }
 
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setRoleHierarchy(roleHierarchy);
+        return handler;
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .requestMatchers(PathRequest.toH2Console());
+    }
 }
